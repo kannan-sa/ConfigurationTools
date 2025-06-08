@@ -12,16 +12,33 @@ namespace ConfigurationTool {
     public abstract class Reference<T> : Reference {
         [SerializeField]
         public FieldList<T> list;
-        public T value;
         public int index;
-        public bool useValue;
+
+        public T direct;
+        public bool useDirect;
+
+        public T value {
+            get => useDirect ? direct : list[index];
+            set {
+                if (useDirect)
+                    direct = value;
+                else 
+                    list[index] = value;
+            }
+        }
 
         public static implicit operator T(Reference<T> reference) {
-            return reference.list.ElementAt(reference.index);
+            return reference.value;
         }
 
         public static implicit operator bool(Reference<T> reference) {
-            return (!reference.useValue && reference.list != null && reference.list.Count() > reference.index) || (reference.value != null && reference.useValue);
+            int index = reference.index;
+            int count = reference.list.Count();
+            bool inBound = count > index && index > -1;
+
+            bool isReference = !reference.useDirect && reference.list != null && inBound;
+            bool isDirect = reference.useDirect && reference.direct != null;
+            return isReference || isDirect;
         }
     }
 
@@ -32,22 +49,39 @@ namespace ConfigurationTool {
 
     [Serializable]
     public abstract class ReferenceWithString<T> : ReferenceWithString {
+        //linking details
         [SerializeField]
         public FieldList<T> list;
-        public T value;
         public string link;
-        public bool useValue;
+
+        //direct details
+        public bool useDirect;
+        public T direct;
+
+        public T value {
+            get => list[index];
+            set => list[index] = value;
+        }
+
+        public int index { get {
+                string[] items = list.ToStrings();
+                int index = Array.IndexOf(items, link);
+                return index;
+            }
+        } 
 
         public static implicit operator T(ReferenceWithString<T> reference) {
-            string[] items = reference.list.ToStrings();
-            int index = Array.IndexOf(items, reference.link);
-            return reference.list.ElementAt(index);
+            return reference ? reference.value : default(T);
         }
 
         public static implicit operator bool(ReferenceWithString<T> reference) {
-            string[] items = reference.list.ToStrings();
-            int index = Array.IndexOf(items, reference.link);
-            return (!reference.useValue && reference.list != null && reference.list.Count() > index && index > -1) || (reference.value != null && reference.useValue);
+            int index = reference.index;
+            int count = reference.list.Count();
+            bool inBound = count > index && index > -1;
+
+            bool isReference = !reference.useDirect && reference.list != null && inBound;
+            bool isDirect = reference.useDirect && reference.direct != null;
+            return isReference || isDirect;
         }
     }
 }

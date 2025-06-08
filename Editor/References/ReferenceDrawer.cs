@@ -6,7 +6,7 @@ namespace ConfigurationTool {
     [CustomPropertyDrawer(typeof(Reference), true)]
     public class ReferenceDrawer : PropertyDrawer {
         private readonly string[] popupOptions =
-               { "Reset", "Use Variable" };
+               { "Reset", "Use Direct" };
 
         /// <summary> Cached style to use to draw the popup button. </summary>
         private GUIStyle popupStyle;
@@ -25,8 +25,8 @@ namespace ConfigurationTool {
             // Get properties
             SerializedProperty list = property.FindPropertyRelative("list");
             SerializedProperty index = property.FindPropertyRelative("index");
-            SerializedProperty value = property.FindPropertyRelative("value");
-            SerializedProperty useValue = property.FindPropertyRelative("useValue");
+            SerializedProperty direct = property.FindPropertyRelative("direct");
+            SerializedProperty useDirect = property.FindPropertyRelative("useDirect");
 
             // Calculate rect for configuration button
             Rect buttonRect = new Rect(position);
@@ -38,7 +38,7 @@ namespace ConfigurationTool {
             int indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
-            popupOptions[1] = useValue.boolValue ? "Use Reference" : "Use Value";
+            popupOptions[1] = useDirect.boolValue ? "Use Reference" : "Use Direct";
 
             int result = EditorGUI.Popup(buttonRect, -1, popupOptions, popupStyle);
 
@@ -47,13 +47,13 @@ namespace ConfigurationTool {
                     list.objectReferenceValue = null;
                     break;
                 case 1:
-                    useValue.boolValue = !useValue.boolValue;
+                    useDirect.boolValue = !useDirect.boolValue;
                     break;
             }
 
-            if (useValue.boolValue) {
+            if (useDirect.boolValue) {
                 EditorGUI.PropertyField(position,
-                            value,
+                            direct,
                             GUIContent.none);
             }
             else {

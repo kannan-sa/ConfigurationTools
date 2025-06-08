@@ -14,7 +14,7 @@ namespace ConfigurationTool {
         [SerializeField]
         public FieldList<T> list;
 
-        public T[] values;
+        public T[] values = new T[0];
 
 
         protected void OnEnable() {

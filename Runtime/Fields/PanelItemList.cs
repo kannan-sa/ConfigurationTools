@@ -6,20 +6,13 @@ using UnityEngine;
 namespace ConfigurationTool {
 
     [Serializable]
-    public class Item : ICloneable {
-        public string title;
-        public string description;
-        public string iconPath;
-        public Sprite icon;
-
-        public object Clone() {
-            return this.MemberwiseClone();
-        }
+    public class PanelItem : Item {
+        public GameObjectReference panel;
     }
 
-    [CreateAssetMenu(menuName = "List/Items", fileName = "Items")]
+    [CreateAssetMenu(menuName = "List/PanelItems", fileName = "PanelItems")]
 
-    public class ItemList : FieldList<Item> {
+    public class PanelItemList : FieldList<PanelItem> {
         public override string GetTitle(int index) {
             return list[index].title;
         }
