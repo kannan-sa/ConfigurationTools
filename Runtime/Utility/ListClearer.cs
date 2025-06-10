@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace ConfigurationTool {
@@ -14,12 +13,15 @@ namespace ConfigurationTool {
             Clear();
         }
 
-        [InitializeOnLoadMethod]
+#if UNITY_EDITOR
+
+        [UnityEditor.InitializeOnLoadMethod]
         static void InitializeAfterCompilation() {        //for awake missing after editor compilation..
             if (!instance)
                 instance = FindObjectOfType<ListClearer>();
             instance?.Clear();
         }
+#endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void InitializeAfterEditorSceneLoad() {         //for awake missing on editor entering play mode..

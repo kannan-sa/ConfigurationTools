@@ -32,8 +32,16 @@ namespace ConfigurationTool {
         }
 
         private void SyncItems() {
-            for (int i = 0; i < list.Count(); i++) {
-                views[i].Initialize(list[i]);
+            int count = Mathf.Max(views.Count, list.Count());
+            for (int i = 0; i < count; i++) {
+                bool viewAvailable = i < views.Count;
+                bool itemAvailable = i < list.Count();
+                if (viewAvailable && itemAvailable)
+                    views[i].Initialize(list[i]);   //initialize if views are available..
+                else if (!viewAvailable && itemAvailable)
+                    Construct(list[i]); //construct if views are over..
+                else if (viewAvailable && !itemAvailable)
+                    Destruct(views[i]); //Destruct if items are over..
             }
         }
 
@@ -85,14 +93,18 @@ namespace ConfigurationTool {
 
         private void Destruct(T item) {
             View<T> view = views.FirstOrDefault(x => x.model.Equals(item));
-            if (view != null) {
-                if (Application.isPlaying)
-                    Destroy(view.gameObject);
-                else
-                    DestroyImmediate(view.gameObject);
+            if (view != null)
+                Destruct(view);
+        }
 
-                views.Remove(view);
-            }
+        private void Destruct(View<T> view)
+        {
+            if (Application.isPlaying)
+                Destroy(view.gameObject);
+            else
+                DestroyImmediate(view.gameObject);
+
+            views.Remove(view);
         }
 
         IEnumerator DelayAction(Action action) {
